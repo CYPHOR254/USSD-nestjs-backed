@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model sys_users {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  hashedPassword String
+  idNumber       Int       @unique
+  phoneNumber    BigInt
+  userType       String
+  status         Boolean
+  isBlocked      Boolean   @default(false)
+  loginTrials    Int
+  firstTimeLogin Boolean   @default(true)
+  lastLogin      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt()
+  createdBy      Int?
+}
+
+model profiles {
+  id          Int      @id @default(autoincrement())
+  profileName String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt()
+}
+
+model roles {
+  id        Int      @id @default(autoincrement())
+  roleName  String
+  profiles  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model redis_conn {
+  id        Int      @id @default(autoincrement())
+  userEmail String
+  redisPort Int
+  redisIP   String
+  createdAt DateTime @default(now())
+  isActive  Boolean  @default(false)
+}
+
+model hosted_ussd_urls {
+  id         Int      @id @default(autoincrement())
+  userEmail  String
+  protocol   String
+  urlIP      String
+  urlPort    Int
+  params     String
+  createdAt  DateTime @default(now())
+}
+
+model redis_db_mngt {
+  id            Int      @id @default(autoincrement())
+  redisIP       String
+  redisPort     Int
+  redisdb       Int
+  allowedUserId String
+  updatedBy     Int
+  updatedAt     DateTime @updatedAt()
+  createdBy     Int
+  createdAt     DateTime @default(now())
+}

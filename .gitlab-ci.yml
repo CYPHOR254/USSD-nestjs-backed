@@ -1,0 +1,40 @@
+stages:
+  - pre-build
+  - build
+  - postBuild
+
+build-image-builder:      
+  stage: pre-build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "development"'
+    changes:
+      - "package.json"
+      - "package-lock.json"
+  - if: '$CI_COMMIT_BRANCH == "cicd-testing"'
+  script:
+    - /kaniko/executor
+      --context "$PWD"
+      --dockerfile "builder.Dockerfile"
+      --destination devops-registry.ekenya.co.ke/configurable-ussd/configurable-ussd-backend-builder:latest
+
+
+build-app-image:
+  stage: build
+  image: 
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'development'
+      variables:         
+        IMAGE_TAG: "dev"
+    - if: $CI_COMMIT_BRANCH == 'cicd-testing'
+      variables:
+        IMAGE_TAG: "test"
+  script:
+    - /kaniko/executor
+      --context "$PWD"
+      --dockerfile "Dockerfile"
+      --destination devops-registry.ekenya.co.ke/configurable-ussd/configurable-ussd-backend:"$IMAGE_TAG"
